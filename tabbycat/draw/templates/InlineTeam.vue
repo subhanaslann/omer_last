@@ -5,7 +5,7 @@
     <div :class="[this.isLive ? '' : 'not-live']" v-text="teamName"></div>
     <div class="history-tooltip tooltip" v-if="hasHistory">
       <div :class="['tooltip-inner conflictable', 'hover-histories-' + hasHistory + '-ago']">
-        {{ hasHistory }} ago
+        {{ hasHistory }} ago <template v-if="maxOccurrences > 1">× {{ maxOccurrences }}</template>
       </div>
     </div>
   </div>
