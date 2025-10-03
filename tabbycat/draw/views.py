@@ -5,6 +5,7 @@ from itertools import product
 from zoneinfo import ZoneInfo
 
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import OuterRef, Subquery
 from django.http import HttpResponseRedirect
 from django.utils import timezone
@@ -19,7 +20,7 @@ from django.views.generic.edit import FormView
 
 from actionlog.mixins import LogActionMixin
 from actionlog.models import ActionLogEntry
-from adjallocation.models import DebateAdjudicator
+from adjallocation.models import DebateAdjudicator, PreformedPanel, PreformedPanelAdjudicator
 from adjallocation.utils import adjudicator_conflicts_display
 from availability.utils import annotate_availability
 from draw.generator.powerpair import BasePowerPairedDrawGenerator
@@ -754,6 +755,28 @@ class ConfirmDrawRegenerationView(LogActionMixin, AdministratorMixin, RoundMixin
         return kwargs
 
     def form_valid(self, form):
+        # If selected, overwrite preformed panels from current debates before deletion
+        if form.cleaned_data.get('overwrite_preformed_panels'):
+            with transaction.atomic():
+                self.round.preformedpanel_set.all().delete()
+                debates = Debate.objects.filter(round=self.round).prefetch_related('debateadjudicator_set__adjudicator')
+                for debate in debates:
+                    panel = PreformedPanel.objects.create(
+                        round=self.round,
+                        importance=float(debate.importance),
+                        bracket_min=debate.bracket,
+                        bracket_max=debate.bracket,
+                        room_rank=debate.room_rank,
+                        liveness=0,
+                    )
+                    for da in debate.debateadjudicator_set.all():
+                        PreformedPanelAdjudicator.objects.create(
+                            panel=panel,
+                            adjudicator=da.adjudicator,
+                            type=da.type,
+                        )
+            messages.success(self.request, _("Overwrote preformed panels with current panels."))
+
         delete_round_draw(self.round)
         messages.success(self.request, _("Deleted the draw. You can now recreate it as normal."))
         return super().form_valid(form)
