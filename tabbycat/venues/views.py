@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Max, Min, Q
 from django.forms import Select
 from django.utils.translation import gettext as _, gettext_lazy, ngettext
@@ -9,6 +10,7 @@ from django.views.generic import TemplateView
 from actionlog.mixins import LogActionMixin
 from actionlog.models import ActionLogEntry
 from availability.utils import annotate_availability
+from participants.models import Adjudicator, Institution, Team
 from tournaments.mixins import DebateDragAndDropMixin, TournamentMixin
 from users.permissions import Permission
 from utils.forms import SelectPrepopulated
@@ -48,6 +50,59 @@ class EditDebateVenuesView(DebateDragAndDropMixin, AdministratorMixin, TemplateV
         # Most recently created venues take priority in getting the highlight
         vcs = VenueCategory.objects.order_by('id').reverse()
         info['highlights']['category'] = [{'pk': vc.id, 'fields': {'name': vc.name}} for vc in vcs]
+        # Provide venue constraint data for client-side highlighting
+        # Build a mapping of (content_type_id, subject_id) -> [category_ids]
+        draw = self.get_draw_or_panels_objects()
+        constraints_qs = VenueConstraint.objects.filter_for_debates(draw).select_related('category')
+        subject_allowed = {}
+        for vc in constraints_qs:
+            key = (vc.subject_content_type_id, vc.subject_id)
+            subject_allowed.setdefault(key, set()).add(vc.category_id)
+
+        # For each debate, collect allowed category sets for all constrained subjects present
+        team_type = ContentType.objects.get_for_model(Team).id
+        institution_type = ContentType.objects.get_for_model(Institution).id
+        adjudicator_type = ContentType.objects.get_for_model(Adjudicator).id
+        debates_constraints = {}
+        for debate in draw:
+            per_subject_allowed_lists = []
+            for dt in debate.debateteam_set.all():
+                team = dt.team
+                if team is not None:
+                    key_team = (team_type, team.id)
+                    if key_team in subject_allowed:
+                        per_subject_allowed_lists.append(list(subject_allowed[key_team]))
+                    if team.institution_id is not None:
+                        inst = team.institution
+                        key_inst = (institution_type, inst.id)
+                        if key_inst in subject_allowed:
+                            per_subject_allowed_lists.append(list(subject_allowed[key_inst]))
+            for da in debate.debateadjudicator_set.all():
+                adj = da.adjudicator
+                key_adj = (adjudicator_type, adj.id)
+                if key_adj in subject_allowed:
+                    per_subject_allowed_lists.append(list(subject_allowed[key_adj]))
+
+            if per_subject_allowed_lists:
+                debates_constraints[debate.id] = per_subject_allowed_lists
+
+        teams_map = {}
+        institutions_map = {}
+        adjudicators_map = {}
+        for (ctype_id, subj_id), cats in subject_allowed.items():
+            if ctype_id == team_type:
+                teams_map[subj_id] = list(cats)
+            elif ctype_id == institution_type:
+                institutions_map[subj_id] = list(cats)
+            elif ctype_id == adjudicator_type:
+                adjudicators_map[subj_id] = list(cats)
+
+        info['constraints'] = {
+            'debates': debates_constraints,
+            'teams': teams_map,
+            'institutions': institutions_map,
+            'adjudicators': adjudicators_map,
+        }
         return info
 
 

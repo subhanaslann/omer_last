@@ -21,7 +21,8 @@
         <droppable-item slot="venue" :handle-drop="moveVenue" :drop-context="{ 'assignment': debate.id }"
                         class="flex-12 flex-truncate border-right d-flex flex-wrap">
           <draggable-venue v-if="debate.venue" :item="allVenues[debate.venue]" class="flex-fill"
-                           :drag-payload="{ 'item': debate.venue, 'assignment': debate.id }">
+                           :drag-payload="{ 'item': debate.venue, 'assignment': debate.id }"
+                           :debate-or-panel-id="debate.id">
           </draggable-venue>
         </droppable-item>
       </drag-and-drop-debate>
