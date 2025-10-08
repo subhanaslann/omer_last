@@ -9,6 +9,8 @@ from django.views.generic import TemplateView
 from actionlog.mixins import LogActionMixin
 from actionlog.models import ActionLogEntry
 from availability.utils import annotate_availability
+from draw.models import Debate
+from draw.types import DebateSide
 from tournaments.mixins import DebateDragAndDropMixin, TournamentMixin
 from users.permissions import Permission
 from utils.forms import SelectPrepopulated
@@ -49,6 +51,20 @@ class EditDebateVenuesView(DebateDragAndDropMixin, AdministratorMixin, TemplateV
         vcs = VenueCategory.objects.order_by('id').reverse()
         info['highlights']['category'] = [{'pk': vc.id, 'fields': {'name': vc.name}} for vc in vcs]
         return info
+
+
+class MultiRoundEditDebateVenuesView(EditDebateVenuesView):
+    template_name = "edit_debate_venues.html"
+    page_title = gettext_lazy("Edit Rooms (Concurrent Rounds)")
+
+    def get_draw_or_panels_objects(self):
+        # Include debates from all current elimination rounds (one per break category)
+        if not self.round.is_break_round:
+            return super().get_draw_or_panels_objects()
+
+        return Debate.objects.filter(round__in=self.tournament.current_rounds).exclude(
+            debateteam__side=DebateSide.BYE,
+        ).select_related('round__tournament', 'venue').prefetch_related('venue__venuecategory_set', 'debateteam_set__team__break_categories')
 
 
 class VenueCategoriesView(LogActionMixin, AdministratorMixin, TournamentMixin, ModelFormSetView):
