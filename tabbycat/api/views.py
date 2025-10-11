@@ -995,7 +995,7 @@ class PairingViewSet(RoundAPIMixin, ModelViewSet):
             return draw_status or result_status or t.pref('all_results_released')
 
         def get_round_status(self, view):
-            return getattr(view.round, view.round_released_field) == view.round_released_value
+            return getattr(view.round, view.round_released_field) in view.round_released_values
 
     serializer_class = serializers.RoundPairingSerializer
     lookup_url_kwarg = 'debate_pk'
@@ -1003,7 +1003,7 @@ class PairingViewSet(RoundAPIMixin, ModelViewSet):
     access_preference = 'public_draw'
 
     round_released_field = 'draw_status'
-    round_released_value = Round.Status.RELEASED
+    round_released_values = [Round.Status.RELEASED, Round.Status.TEAMS_RELEASED]
 
     list_permission = Permission.VIEW_DEBATE
     create_permission = Permission.GENERATE_DEBATE

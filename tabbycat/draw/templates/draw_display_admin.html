@@ -97,6 +97,36 @@
           {% trans "The draw for this round is still in a draft state. Confirm the draw before releasing it." as text %}
           {% include "components/item-info.html" with nopad=True type="warning" %}
 
+        {% elif round.draw_status == round.Status.TEAMS_RELEASED %}
+
+          {% trans "Unrelease draw to public" as un_release_text %}
+          {% trans "Release draw with adjudicators" as full_release_text %}
+          <form id="releaseDrawForm" method="POST" action="{% roundurl 'draw-unrelease' %}">{% csrf_token %}</form>
+          <form id="fullReleaseDrawForm" method="POST" action="{% roundurl 'draw-release' %}">{% csrf_token %}</form>
+          {% tournamenturl 'options-tournament-section' section='public_features' as alert_link %}
+
+          {% if pref.public_draw != 'off' %}
+            {% trans "The draw has been released publicly (teams only, without adjudicators)." as text %}
+            {% include "components/item-info.html" with nopad=True type="" %}
+
+            {% trans "View public draw page" as text %}
+            {% if pref.public_draw == 'current' and round == current_round %}
+              {% tournamenturl 'draw-public-current-rounds' as public_link %}
+              {% include "components/item-action.html" with type="info" url=public_link icon="eye" %}
+            {% elif pref.public_draw == 'all-released' %}
+              {% roundurl 'draw-public-for-round' as public_link %}
+              {% include "components/item-action.html" with type="info" url=public_link icon="eye" %}
+            {% endif %}
+          {% else %}
+            {% blocktrans trimmed asvar text %}
+              You have released the draw (teams only), but it will not show to the public unless the "public view of draw" setting is enabled in <a class="alert-link" href="{{ alert_link }}"> this tournament's configuration</a>.
+            {% endblocktrans %}
+            {% include "components/item-info.html" with nopad=True type="warning" %}
+          {% endif %}
+
+          {% include "components/item-action.html" with id="triggerFullReleaseDrawForm" url="" text=full_release_text type="success" to_complete=True %}
+          {% include "components/item-action.html" with id="triggerReleaseDrawForm" url="" text=un_release_text %}
+
         {% elif round.draw_status == round.Status.RELEASED %}
 
           {% trans "Unrelease draw to public" as un_release_text %}
@@ -132,7 +162,9 @@
         {% else %}
 
           {% trans "Release draw to public" as release_text %}
+          {% trans "Release draw (teams only)" as teams_release_text %}
           <form id="releaseDrawForm" method="POST" action="{% roundurl 'draw-release' %}">{% csrf_token %}</form>
+          <form id="teamsReleaseDrawForm" method="POST" action="{% roundurl 'draw-teams-release' %}">{% csrf_token %}</form>
 
           {% if pref.participant_ballots != 'off' or pref.participant_feedback != 'off' or pref.public_draw != 'off' %}
 
@@ -152,6 +184,7 @@
             {% endif %}
 
             {% include "components/item-action.html" with type="success" id="triggerReleaseDrawForm" text=release_text url="" to_complete=True %}
+            {% include "components/item-action.html" with type="success" id="triggerTeamsReleaseDrawForm" text=teams_release_text url="" icon="users" %}
 
           {% else %}
 
@@ -159,6 +192,7 @@
             {% include "components/item-info.html" with nopad=True type="secondary" %}
 
             {% include "components/item-action.html" with id="triggerReleaseDrawForm" text=release_text url="" %}
+            {% include "components/item-action.html" with id="triggerTeamsReleaseDrawForm" text=teams_release_text url="" icon="users" %}
 
           {% endif %}
 
@@ -379,6 +413,14 @@
     $(document).ready( function() { // Use the fake submit buttons as real submission
       $("#triggerReleaseDrawForm").click( function() {
         $("#releaseDrawForm").submit();
+        return false;
+      });
+      $("#triggerTeamsReleaseDrawForm").click( function() {
+        $("#teamsReleaseDrawForm").submit();
+        return false;
+      });
+      $("#triggerFullReleaseDrawForm").click( function() {
+        $("#fullReleaseDrawForm").submit();
         return false;
       });
       $("#triggerReleaseMotionsForm").click( function() {

@@ -1073,6 +1073,9 @@ class RoundPairingSerializer(serializers.ModelSerializer):
                 self.fields.pop('result_status')
                 self.fields.pop('flags')
 
+                if self.context['round'].draw_status == Round.Status.TEAMS_RELEASED:
+                    self.fields.pop('adjudicators')
+
     class Meta:
         model = Debate
         exclude = ('round',)
