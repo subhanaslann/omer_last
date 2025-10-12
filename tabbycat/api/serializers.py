@@ -3,6 +3,7 @@ from collections.abc import Mapping
 from datetime import date, datetime, time
 from functools import partial, partialmethod
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -10,6 +11,7 @@ from django.db import IntegrityError
 from django.db.models import Q, QuerySet
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema_field
+from push_notifications.api.rest_framework import WebPushDeviceSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.fields import get_error_detail, SkipField
@@ -21,6 +23,7 @@ from breakqual.models import BreakCategory, BreakingTeam
 from draw.manager import DrawManager
 from draw.models import Debate, DebateTeam
 from motions.models import DebateTeamMotionPreference, Motion, RoundMotion
+from notifications.models import ParticipantWebPushDevice
 from options.preferences import (BPAssignmentMethod, BPPositionCost, BPPullupDistribution, DrawAvoidConflicts,
     DrawOddBracket, DrawPairingMethod, DrawPullupRestriction, DrawSideAllocations)
 from participants.emoji import pick_unused_emoji
@@ -1724,3 +1727,41 @@ class ParticipantIdentificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = '__all__'
+
+
+class ParticipantWebPushDeviceSerializer(WebPushDeviceSerializer):
+    """
+    Serializer for TabbycatWebPushDevice that extends the base WebPushDeviceSerializer
+    to include participant and language fields.
+    """
+    class ParticipantIdField(fields.BaseSourceField):
+        field_source_name = 'participant'
+        models = {
+            'api-speaker-detail': (Speaker, 'pk'),
+            'api-adjudicator-detail': (Adjudicator, 'pk'),
+        }
+
+    participant = ParticipantIdField(required=False, allow_null=True)
+    language = serializers.ChoiceField(
+        choices=settings.LANGUAGES,
+        allow_blank=True,
+        help_text="The language code (e.g., 'en', 'es', 'fr') for the participant",
+    )
+
+    class Meta(WebPushDeviceSerializer.Meta):
+        model = ParticipantWebPushDevice
+        fields = WebPushDeviceSerializer.Meta.fields + ('participant', 'language')
+        extra_kwargs = WebPushDeviceSerializer.Meta.extra_kwargs.copy()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not is_staff(kwargs.get('context')):
+            self.fields.pop('participant')
+
+    def create(self, validated_data):
+        if not validated_data.get('participant') and getattr(self.context['request'].user, 'is_anonymous', True):
+            validated_data['participant'] = self.context['request'].auth
+        if not validated_data.get('language'):
+            validated_data['language'] = 'en'
+
+        return super().create(validated_data)

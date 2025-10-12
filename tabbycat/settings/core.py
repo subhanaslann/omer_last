@@ -162,6 +162,7 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'drf_spectacular',
     'django_better_admin_arrayfield',
+    'push_notifications',
 )
 
 ROOT_URLCONF = 'urls'
@@ -404,3 +405,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# ==============================================================================
+# Push Notifications (WebPush)
+# ==============================================================================
+
+PUSH_NOTIFICATIONS_SETTINGS = {
+    "WP_PRIVATE_KEY": os.environ.get("WP_PRIVATE_KEY"),
+    "WP_PUBLIC_KEY": os.environ.get("WP_PUBLIC_KEY"),
+    "WP_CLAIMS": {
+        "sub": os.environ.get("WP_CLAIMS_EMAIL", "mailto:contact@tabbycat-debate.org")
+    },
+    "application_server_key": os.environ.get("WP_APPLICATION_SERVER_KEY")
+}
