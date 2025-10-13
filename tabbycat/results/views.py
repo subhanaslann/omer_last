@@ -569,7 +569,7 @@ class BasePublicNewBallotSetView(PersonalizablePublicTournamentPageMixin, RoundM
             return self.error_page(_("The draw for this round hasn't been released yet."))
 
         if (self.tournament.pref('enable_motions') or self.tournament.pref('motion_vetoes_enabled')) \
-                and not self.round.motions_released:
+                and self.round.motions_status != Round.MotionsStatus.MOTIONS_RELEASED:
             return self.error_page(_("The motions for this round haven't been released yet."))
 
         try:

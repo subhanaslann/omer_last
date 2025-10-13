@@ -83,6 +83,7 @@ class RoundSerializerTests(CompletedTournamentTestMixin, APITestCase):
             "draw_status": "R",
             "silent": False,
             "motions_released": False,
+            "motions_status": "N",
             "weight": 1,
         }
 

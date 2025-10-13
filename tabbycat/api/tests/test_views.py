@@ -6,6 +6,7 @@ from django.urls import reverse
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework.test import APITestCase
 
+from tournaments.models import Round
 from utils.tests import CompletedTournamentTestMixin, V1_ROOT_URL
 
 
@@ -63,7 +64,7 @@ class MotionViewsetTests(CompletedTournamentTestMixin, APITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_exclude_unreleased_public(self):
-        self.tournament.round_set.filter(seq=1).update(motions_released=True)
+        self.tournament.round_set.filter(seq=1).update(motions_status=Round.MotionsStatus.MOTIONS_RELEASED)
 
         self.tournament.preferences['public_features__public_motions'] = True
         self.tournament.preferences['tab_release__motion_tab_released'] = False
@@ -72,7 +73,7 @@ class MotionViewsetTests(CompletedTournamentTestMixin, APITestCase):
         self.assertEqual(len(response.data), 3)
         for motion in response.data:
             self.assertEqual(len(motion['rounds']), 1)
-        self.tournament.round_set.filter(seq=1).update(motions_released=False) # Reset
+        self.tournament.round_set.filter(seq=1).update(motions_status=Round.MotionsStatus.NOT_RELEASED) # Reset
 
     def test_include_unreleased_tab_public(self):
         self.tournament.preferences['public_features__public_motions'] = False
@@ -108,7 +109,7 @@ class RoundViewsetTests(CompletedTournamentTestMixin, APITestCase):
 
     def test_patch_round_detail(self):
         # Ensure the test will be valid first
-        self.assertEqual(self.round.motions_released, False)
+        self.assertEqual(self.round.motions_status, Round.MotionsStatus.NOT_RELEASED)
 
         self.client.login(username="admin", password="admin")
 
@@ -121,7 +122,7 @@ class RoundViewsetTests(CompletedTournamentTestMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['motions_released'], True)
         self.round.refresh_from_db()
-        self.assertEqual(self.round.motions_released, True)
+        self.assertEqual(self.round.motions_status, Round.MotionsStatus.MOTIONS_RELEASED)
 
     def test_post_round_detail(self):
         # Ensure the test will be valid first

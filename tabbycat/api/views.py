@@ -208,7 +208,7 @@ class MotionViewSet(TournamentAPIMixin, TournamentPublicAPIMixin, ModelViewSet):
     def get_queryset(self):
         filters = Q()
         if self.tournament.pref('public_motions') and not (self.tournament.pref('motion_tab_released') or self.request.user.is_staff):
-            filters &= Q(rounds__motions_released=True)
+            filters &= Q(rounds__motions_status=Round.MotionsStatus.MOTIONS_RELEASED)
         return super().get_queryset().filter(filters).prefetch_related('roundmotion_set', 'roundmotion_set__round')
 
 

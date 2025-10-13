@@ -217,6 +217,16 @@ class RoundSerializer(serializers.ModelSerializer):
             value = datetime.combine(date.today(), value)
             return super().to_internal_value(value)
 
+    class MotionsReleasedField(serializers.BooleanField):
+        def to_representation(self, value):
+            return value == Round.MotionsStatus.MOTIONS_RELEASED
+
+        def to_internal_value(self, value):
+            if value:
+                return Round.MotionsStatus.MOTIONS_RELEASED
+            else:
+                return Round.MotionsStatus.NOT_RELEASED
+
     url = fields.TournamentHyperlinkedIdentityField(
         view_name='api-round-detail',
         lookup_field='seq', lookup_url_kwarg='round_seq')
@@ -226,7 +236,7 @@ class RoundSerializer(serializers.ModelSerializer):
         allow_null=True, required=False)
     motions = RoundMotionSerializer(many=True, source='roundmotion_set', required=False)
     starts_at = TimeOrDateTimeField(required=False, allow_null=True)
-
+    motions_released = MotionsReleasedField(required=False, allow_null=True, source='motions_status')
     _links = RoundLinksSerializer(source='*', read_only=True)
 
     def __init__(self, *args, **kwargs):
@@ -237,7 +247,7 @@ class RoundSerializer(serializers.ModelSerializer):
                 self.fields.pop('feedback_weight')
 
             # Can't show in a ListSerializer
-            if not with_permission(permission=Permission.VIEW_MOTION) and (isinstance(self.instance, QuerySet) or not self.instance.motions_released):
+            if not with_permission(permission=Permission.VIEW_MOTION) and (isinstance(self.instance, QuerySet) or self.instance.motions_status != Round.MotionsStatus.MOTIONS_RELEASED):
                 self.fields.pop('motions')
 
     class Meta:

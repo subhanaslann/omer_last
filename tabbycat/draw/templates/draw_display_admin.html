@@ -177,6 +177,11 @@
       {% plural %}
         Release motions to public
       {% endblocktranslate %}
+      {% blocktranslate trimmed count counter=expected_nmotions asvar release_infoslides_text %}
+        Release info-slide to public
+      {% plural %}
+        Release info-slides to public
+      {% endblocktranslate %}
       {% blocktranslate trimmed count counter=expected_nmotions asvar unrelease_text %}
         Unrelease motion to public
       {% plural %}
@@ -203,8 +208,10 @@
           {% include "components/item-info.html" with nopad=True type="warning" %}
         {% endif %}
 
-        {% if not round.motions_released %}
+        {% if round.motions_status == round.MotionsStatus.NOT_RELEASED %}
 
+          <form id="releaseInfoSlidesForm" method="POST" hidden
+                action="{% roundurl 'motions-release-infoslides' %}">{% csrf_token %}</form>
           <form id="releaseMotionsForm" method="POST" hidden
                 action="{% roundurl 'motions-release' %}">{% csrf_token %}</form>
           {% if pref.participant_ballots != 'off' and pref.enable_motions %}
@@ -231,15 +238,36 @@
 
           {% if round.motion_set.exists %}
               {% if pref.enable_motions or pref.motion_vetoes_enabled or pref.public_motions %}
+                  {% include "components/item-action.html" with type="success" id="triggerReleaseInfoSlidesForm" text=release_infoslides_text url="" to_complete=True %}
                   {% include "components/item-action.html" with type="success" id="triggerReleaseMotionsForm" text=release_text url="" to_complete=True %}
               {% else %}
+                  {% include "components/item-action.html" with id="triggerReleaseInfoSlidesForm" text=release_infoslides_text url="" %}
                   {% include "components/item-action.html" with id="triggerReleaseMotionsForm" text=release_text url="" %}
               {% endif %}
           {% endif %}
 
-        {% else %}
+        {% elif round.motions_status == round.MotionsStatus.INFO_SLIDES_RELEASED %}
 
           <form id="releaseMotionsForm" method="POST" hidden
+                action="{% roundurl 'motions-release' %}">{% csrf_token %}</form>
+          <form id="unreleaseMotionsForm" method="POST" hidden
+                action="{% roundurl 'motions-unrelease' %}">{% csrf_token %}</form>
+
+          {% blocktranslate trimmed count counter=expected_nmotions asvar text %}
+            Info-slides have been released. You can now release the full motions.
+          {% plural %}
+            Info-slides have been released. You can now release the full motions.
+          {% endblocktranslate %}
+          {% include "components/item-info.html" with nopad=True type="info" %}
+
+          {% if round.motion_set.exists %}
+              {% include "components/item-action.html" with type="success" id="triggerReleaseMotionsForm" text=release_text url="" to_complete=True %}
+              {% include "components/item-action.html" with id="triggerUnreleaseMotionsForm" url="" text=unrelease_text %}
+          {% endif %}
+
+        {% else %}
+
+          <form id="unreleaseMotionsForm" method="POST" hidden
                 action="{% roundurl 'motions-unrelease' %}">{% csrf_token %}</form>
           {# "and" takes precedence over "or" #}
           {% if pref.public_motions or pref.participant_ballots != 'off' and pref.enable_motions or pref.participant_ballots != 'off' and pref.motion_vetoes_enabled %}
@@ -264,7 +292,7 @@
             {% include "components/item-info.html" with nopad=True type="warning" %}
           {% endif %}
 
-          {% include "components/item-action.html" with id="triggerReleaseMotionsForm" url="" text=unrelease_text %}
+          {% include "components/item-action.html" with id="triggerUnreleaseMotionsForm" url="" text=unrelease_text %}
 
         {% endif %}
       </div>
@@ -381,8 +409,16 @@
         $("#releaseDrawForm").submit();
         return false;
       });
+      $("#triggerReleaseInfoSlidesForm").click( function() {
+        $("#releaseInfoSlidesForm").submit();
+        return false;
+      });
       $("#triggerReleaseMotionsForm").click( function() {
         $("#releaseMotionsForm").submit();
+        return false;
+      });
+      $("#triggerUnreleaseMotionsForm").click( function() {
+        $("#unreleaseMotionsForm").submit();
         return false;
       });
     });
