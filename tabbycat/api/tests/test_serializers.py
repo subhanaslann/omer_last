@@ -1131,14 +1131,15 @@ class FeedbackSerializerTests(APITestCase):
             required=True,
         )
 
-        self.client.login(username="admin1", password="admin")
+        self.tournament.preferences['data_entry__participant_feedback'] = 'private-urls'
+        speaker = Speaker.objects.create(name='Test Speaker', team=self.t1, url_key='test-key')
         response = self.client.post(reverse_tournament('api-feedback-list', self.tournament), {
             'adjudicator': reverse_tournament('api-adjudicator-detail', self.tournament, kwargs={'pk': self.a1.pk}),
             'source': reverse_tournament('api-team-detail', self.tournament, kwargs={'pk': self.t1.pk}),
             'debate': reverse_round('api-pairing-detail', self.round, kwargs={'debate_pk': self.debate.pk}),
             'answers': [],
             'score': 10,
-        })
+        }, HTTP_AUTHORIZATION=f'Key {speaker.url_key}')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['non_field_errors'][0], 'Answer to required question is missing')
 

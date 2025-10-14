@@ -543,12 +543,13 @@ class SpeakerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        allowed_cts = ContentType.objects.filter(Q(app_label='participants', model='speaker') | Q(app_label='participants', model='person'))
-        required_questions = self.context['tournament'].question_set.filter(required=True, for_content_type_id__in=allowed_cts)
-        answers = data.get('answers', [])
+        if not is_staff(self.context):
+            allowed_cts = ContentType.objects.filter(Q(app_label='participants', model='speaker') | Q(app_label='participants', model='person'))
+            required_questions = self.context['tournament'].question_set.filter(required=True, for_content_type_id__in=allowed_cts)
+            answers = data.get('answers', [])
 
-        if len(set(required_questions) - set(a['question'] for a in answers)) > 0:
-            raise serializers.ValidationError("Answer to required question is missing")
+            if len(set(required_questions) - set(a['question'] for a in answers)) > 0:
+                raise serializers.ValidationError("Answer to required question is missing")
 
         return super().validate(data)
 
@@ -661,12 +662,13 @@ class AdjudicatorSerializer(serializers.ModelSerializer):
         exclude = ('tournament',)
 
     def validate(self, data):
-        allowed_cts = ContentType.objects.filter(Q(app_label='participants', model='adjudicator') | Q(app_label='participants', model='person'))
-        required_questions = self.context['tournament'].question_set.filter(required=True, for_content_type_id__in=allowed_cts)
-        answers = data.get('answers', [])
+        if not is_staff(self.context):
+            allowed_cts = ContentType.objects.filter(Q(app_label='participants', model='adjudicator') | Q(app_label='participants', model='person'))
+            required_questions = self.context['tournament'].question_set.filter(required=True, for_content_type_id__in=allowed_cts)
+            answers = data.get('answers', [])
 
-        if len(set(required_questions) - set(a['question'] for a in answers)) > 0:
-            raise serializers.ValidationError("Answer to required question is missing")
+            if len(set(required_questions) - set(a['question'] for a in answers)) > 0:
+                raise serializers.ValidationError("Answer to required question is missing")
 
         return super().validate(data)
 
@@ -790,12 +792,13 @@ class TeamSerializer(serializers.ModelSerializer):
         if data.get('institution') is None and data.get('use_institution_prefix', False):
             raise serializers.ValidationError("Cannot include institution prefix without institution.")
 
-        allowed_cts = ContentType.objects.filter(Q(app_label='participants', model='team'))
-        required_questions = self.context['tournament'].question_set.filter(required=True, for_content_type_id__in=allowed_cts)
-        answers = data.get('answers', [])
+        if not is_staff(self.context):
+            allowed_cts = ContentType.objects.filter(Q(app_label='participants', model='team'))
+            required_questions = self.context['tournament'].question_set.filter(required=True, for_content_type_id__in=allowed_cts)
+            answers = data.get('answers', [])
 
-        if len(set(required_questions) - set(a['question'] for a in answers)) > 0:
-            raise serializers.ValidationError("Answer to required question is missing")
+            if len(set(required_questions) - set(a['question'] for a in answers)) > 0:
+                raise serializers.ValidationError("Answer to required question is missing")
 
         uniqueness_qs = Team.objects.filter(
             tournament=self.context['tournament'],
@@ -1255,11 +1258,12 @@ class FeedbackSerializer(serializers.ModelSerializer):
         debate = data.pop('debate')
 
         source_type = 'from_team' if isinstance(source, Team) else 'from_adj'
-        required_questions = AdjudicatorFeedbackQuestion.objects.filter(tournament=self.context['tournament'], required=True, **{source_type: True})
         answers = data.get('answers', [])
+        if not is_staff(self.context):
+            required_questions = AdjudicatorFeedbackQuestion.objects.filter(tournament=self.context['tournament'], required=True, **{source_type: True})
 
-        if len(set(required_questions) - set(a['question'] for a in answers)) > 0:
-            raise serializers.ValidationError("Answer to required question is missing")
+            if len(set(required_questions) - set(a['question'] for a in answers)) > 0:
+                raise serializers.ValidationError("Answer to required question is missing")
 
         # Test answers for correct source
         for answer in answers:
