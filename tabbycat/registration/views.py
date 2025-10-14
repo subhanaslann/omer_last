@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.forms import SimpleArrayField
@@ -176,11 +178,12 @@ class BaseCreateTeamFormView(LogActionMixin, PublicTournamentPageMixin, CustomQu
 
     def done(self, form_list, form_dict, **kwargs):
         team = form_dict['team'].save()
+        speaker_objs = [s.instance for s in form_dict['speaker']]
         if self.tournament.pref('team_name_generator') != 'user':
-            reference = getattr(self, self.REFERENCE_GENERATORS[self.tournament.pref('team_name_generator')])(form_dict['team'].instance, form_dict['speaker'])
-            form_dict['team'].instance.reference = reference
+            reference = getattr(self, self.REFERENCE_GENERATORS[self.tournament.pref('team_name_generator')])(team, speaker_objs)
+            team.reference = reference
 
-        form_dict['team'].instance.code_name = getattr(self, self.CODE_NAME_GENERATORS[self.tournament.pref('code_name_generator')])(form_dict['team'].instance, form_dict['speaker'])
+        team.code_name = getattr(self, self.CODE_NAME_GENERATORS[self.tournament.pref('code_name_generator')])(team, speaker_objs)
         team.save()
         self.object = team
 
@@ -226,30 +229,30 @@ class BaseCreateTeamFormView(LogActionMixin, PublicTournamentPageMixin, CustomQu
         return ch
 
     @staticmethod
-    def _numerical_reference(team, speakers=None):
+    def _numerical_reference(team, speakers: Sequence[Speaker]):
         teams = team.tournament.team_set.filter(institution=team.institution, reference__regex=r"^\d+$").values_list('reference', flat=True)
         team_numbers = [int(t) for t in teams]
         return str(max(team_numbers) + 1)
 
     @staticmethod
-    def _initials_reference(team, speakers):
-        return "".join(s.instance.last_name[0] for s in speakers)
+    def _initials_reference(team, speakers: Sequence[Speaker]):
+        return "".join(s.last_name[0] for s in speakers)
 
     @staticmethod
-    def _custom_reference(team, speakers=None):
+    def _custom_reference(team, speakers: Sequence[Speaker]):
         return team.reference
 
     @staticmethod
-    def _custom_code_name(team, speakers=None):
+    def _custom_code_name(team, speakers: Sequence[Speaker]):
         return team.code_name
 
     @staticmethod
-    def _emoji_code_name(team, speakers=None):
+    def _emoji_code_name(team, speakers: Sequence[Speaker]):
         return EMOJI_NAMES[team.emoji]
 
     @staticmethod
-    def _last_names_code_name(team, speakers=None):
-        return ' & '.join(s.instance.last_name for s in speakers if s.instance.last_name is not None)
+    def _last_names_code_name(team, speakers: Sequence[Speaker]):
+        return ' & '.join(s.last_name for s in speakers if s.last_name is not None)
 
 
 class PublicCreateTeamFormView(BaseCreateTeamFormView):
