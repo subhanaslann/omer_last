@@ -1425,7 +1425,7 @@ class PointsEmailMessageBody(LongStringPreference):
     name = 'team_points_email_message'
     default = ("<p>Hi {{ USER }},</p>"
         "After {{ ROUND }}, your team ({{ TEAM }}) currently has <strong>{{ POINTS }}</strong> wins in the {{ TOURN }}.</p>"
-        "<p>Current Standings: <a href='{{ URL }}'>{{ URL }}</a></p>")
+        "<p>Current Standings: {{ URL }}</p>")
 
 
 @tournament_preferences_registry.register
@@ -1483,7 +1483,7 @@ class PrivateUrlEmailMessage(LongStringPreference):
         "anyone, as anyone who knows it can submit forms on your behalf. This URL "
         "will not change throughout this tournament, so we suggest bookmarking it.</p>"
         "<p>Your personal private URL is:<br />"
-        "<a href='{{ URL }}'>{{ URL }}</a></p>")
+        "{{ URL }}</p>")
 
 
 @tournament_preferences_registry.register
