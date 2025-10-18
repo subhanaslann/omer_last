@@ -537,7 +537,7 @@ class AdminDrawView(RoundMixin, AdministratorMixin, AdminDrawUtilitiesMixin, Vue
         table.add_draw_conflicts_columns(draw, self.venue_conflicts, self.adjudicator_conflicts)
 
         if not r.is_break_round:
-            table.highlight_rows_by_column_value(column=0) # highlight first row of a new bracket
+            table.highlight_column = 0  # Highlight based on first column (bracket)
 
         return table
 
