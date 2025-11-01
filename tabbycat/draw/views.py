@@ -5,6 +5,7 @@ from itertools import product
 from zoneinfo import ZoneInfo
 
 from django.contrib import messages
+from django.db import DatabaseError, transaction
 from django.db.models import OuterRef, Subquery
 from django.http import HttpResponseRedirect
 from django.utils import timezone
@@ -19,7 +20,7 @@ from django.views.generic.edit import FormView
 
 from actionlog.mixins import LogActionMixin
 from actionlog.models import ActionLogEntry
-from adjallocation.models import DebateAdjudicator
+from adjallocation.models import DebateAdjudicator, PreformedPanel, PreformedPanelAdjudicator
 from adjallocation.utils import adjudicator_conflicts_display
 from availability.utils import annotate_availability
 from draw.generator.powerpair import BasePowerPairedDrawGenerator
@@ -537,7 +538,7 @@ class AdminDrawView(RoundMixin, AdministratorMixin, AdminDrawUtilitiesMixin, Vue
         table.add_draw_conflicts_columns(draw, self.venue_conflicts, self.adjudicator_conflicts)
 
         if not r.is_break_round:
-            table.highlight_rows_by_column_value(column=0) # highlight first row of a new bracket
+            table.highlight_column = 0  # Highlight based on first column (bracket)
 
         return table
 
@@ -672,13 +673,20 @@ class CreateDrawView(DrawStatusEdit):
     action_log_type = ActionLogEntry.ActionType.DRAW_CREATE
 
     def post(self, request, *args, **kwargs):
-        if self.round.draw_status != Round.Status.NONE:
-            messages.error(request, _("Could not create draw for %(round)s, there was already a draw!") % {'round': self.round.name})
-            return super().post(request, *args, **kwargs)
-
         try:
-            manager = DrawManager(self.round)
-            manager.create()
+            # Use atomic transaction with select_for_update to prevent race conditions
+            with transaction.atomic():
+                round_locked = Round.objects.select_for_update(nowait=True).get(pk=self.round.pk)
+
+                if round_locked.draw_status != Round.Status.NONE:
+                    messages.error(request, _("Could not create draw for %(round)s, there is already a draw!") % {'round': round_locked.name})
+                    return super().post(request, *args, **kwargs)
+
+                self.round = round_locked
+
+                manager = DrawManager(self.round)
+                manager.create()
+
         except DrawUserError as e:
             messages.error(request, mark_safe(_(
                 "<p>The draw could not be created, for the following reason: "
@@ -707,6 +715,9 @@ class CreateDrawView(DrawStatusEdit):
             instructions = BaseStandingsView.admin_standings_error_instructions % {'standings_options_url': standings_options_url}
             messages.error(request, mark_safe(message + instructions))
             logger.exception("Error generating standings for draw: " + str(e))
+            return HttpResponseRedirect(reverse_round('availability-index', self.round))
+        except DatabaseError:
+            messages.error(request, _("The draw could not be created, because another user was also creating a draw."))
             return HttpResponseRedirect(reverse_round('availability-index', self.round))
 
         relevant_adj_venue_constraints = VenueConstraint.objects.filter(
@@ -754,6 +765,28 @@ class ConfirmDrawRegenerationView(LogActionMixin, AdministratorMixin, RoundMixin
         return kwargs
 
     def form_valid(self, form):
+        # If selected, overwrite preformed panels from current debates before deletion
+        if form.cleaned_data.get('overwrite_preformed_panels'):
+            with transaction.atomic():
+                self.round.preformedpanel_set.all().delete()
+                debates = Debate.objects.filter(round=self.round).prefetch_related('debateadjudicator_set__adjudicator')
+                for debate in debates:
+                    panel = PreformedPanel.objects.create(
+                        round=self.round,
+                        importance=float(debate.importance),
+                        bracket_min=debate.bracket,
+                        bracket_max=debate.bracket,
+                        room_rank=debate.room_rank,
+                        liveness=0,
+                    )
+                    for da in debate.debateadjudicator_set.all():
+                        PreformedPanelAdjudicator.objects.create(
+                            panel=panel,
+                            adjudicator=da.adjudicator,
+                            type=da.type,
+                        )
+            messages.success(self.request, _("Overwrote preformed panels with current panels."))
+
         delete_round_draw(self.round)
         messages.success(self.request, _("Deleted the draw. You can now recreate it as normal."))
         return super().form_valid(form)

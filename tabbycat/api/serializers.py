@@ -6,7 +6,7 @@ from functools import partial, partialmethod
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db import IntegrityError
+from django.db import DatabaseError, IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema_field
@@ -1184,7 +1184,14 @@ class DrawGenerationSerializer(serializers.Serializer):
     options = OptionsSerializer(required=False, help_text="Options for draw generation; defaults to tournament preferences")
 
     def save(self, **kwargs):
-        return DrawManager(self.context['round'], draw_type=self.validated_data.get('draw_type')).create(self.validated_data.get('options', {}))
+        try:
+            with transaction.atomic():
+                round = Round.objects.select_for_update(nowait=True).get(pk=self.context['round'].pk)
+            if round.draw_status != Round.Status.NONE:
+                raise serializers.ValidationError("There is already a draw", code=409)
+            return DrawManager(round, draw_type=self.validated_data.get('draw_type')).create(self.validated_data.get('options', {}))
+        except DatabaseError:
+            raise serializers.ValidationError("Draw is already getting generated", code=409)
 
 
 class FeedbackQuestionSerializer(serializers.ModelSerializer):

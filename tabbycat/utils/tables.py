@@ -58,6 +58,7 @@ class BaseTableBuilder:
         self.sort_key = kwargs.get('sort_key', '')
         self.sort_order = kwargs.get('sort_order', '')
         self.empty_title = kwargs.get('empty_title', _("No Data Available"))
+        self.highlight_column = None  # Column index to use for row highlighting (None = no highlighting)
 
     @staticmethod
     def _convert_header(header):
@@ -157,6 +158,7 @@ class BaseTableBuilder:
             'class': self.table_class,
             'sort_key': self.sort_key,
             'sort_order': self.sort_order,
+            'highlight_column': self.highlight_column,
         }
 
 
