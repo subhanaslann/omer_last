@@ -35,7 +35,7 @@ class PublicMotionsView(PublicTournamentPageMixin, TemplateView):
         # Include rounds whether *either* motions are released *or* it's this
         # round or a previous round. The template checks motion_released again
         # and displays a "not released" message if motions are not released.
-        filter_q = Q(motions_released=True) | Q(seq__lte=self.tournament.current_round.seq)
+        filter_q = Q(motions_status=Round.MotionsStatus.MOTIONS_RELEASED) | Q(seq__lte=self.tournament.current_round.seq)
 
         kwargs['rounds'] = self.tournament.round_set.filter(filter_q).order_by(
                 order_by).prefetch_related(Prefetch('roundmotion_set',
@@ -165,7 +165,7 @@ class BaseReleaseMotionsView(AdministratorMixin, LogActionMixin, RoundMixin, Pos
 
     def post(self, request, *args, **kwargs):
         round = self.round
-        round.motions_released = self.motions_released
+        round.motions_status = self.motions_status
         round.save()
         self.log_action()
 
@@ -177,7 +177,7 @@ class ReleaseMotionsView(BaseReleaseMotionsView):
     edit_permission = Permission.RELEASE_MOTION
 
     action_log_type = ActionLogEntry.ActionType.MOTIONS_RELEASE
-    motions_released = True
+    motions_status = Round.MotionsStatus.MOTIONS_RELEASED
 
     @property
     def message_text(self):
@@ -196,11 +196,22 @@ class ReleaseMotionsView(BaseReleaseMotionsView):
 class UnreleaseMotionsView(BaseReleaseMotionsView):
 
     action_log_type = ActionLogEntry.ActionType.MOTIONS_UNRELEASE
-    motions_released = False
+    motions_status = Round.MotionsStatus.NOT_RELEASED
 
     @property
     def message_text(self):
         return ngettext("Unreleased the motion.", "Unreleased the motions.", self.round.motion_set.count())
+
+
+class ReleaseInfoSlidesView(BaseReleaseMotionsView):
+    edit_permission = Permission.RELEASE_MOTION
+
+    action_log_type = ActionLogEntry.ActionType.MOTIONS_RELEASE
+    motions_status = Round.MotionsStatus.INFO_SLIDES_RELEASED
+
+    @property
+    def message_text(self):
+        return ngettext("Released the info-slide.", "Released the info-slides.", self.round.motion_set.count())
 
 
 class BaseDisplayMotionsView(RoundMixin, TemplateView):
