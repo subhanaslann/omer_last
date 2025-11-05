@@ -98,7 +98,7 @@ class RoundSerializerTests(CompletedTournamentTestMixin, APITestCase):
 
     def test_include_motions_if_released(self):
         round = self.tournament.round_set.first()
-        round.motions_released = True
+        round.motions_status = Round.MotionsStatus.MOTIONS_RELEASED
         round.save()
 
         response = self.client.get(reverse_round('api-round-detail', self.tournament.round_set.first()))
