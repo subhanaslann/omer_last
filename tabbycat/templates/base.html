@@ -196,7 +196,7 @@
     <!-- Register Service Worker for Push Notifications -->
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("{% url 'static' 'navigatorPush.service.js' %}")
+        navigator.serviceWorker.register("/navigatorPush.service.js")
           .then(function(registration) {
             console.log('Service Worker registered with scope:', registration.scope);
           })
