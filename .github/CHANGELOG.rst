@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+2.12.0 (TBD)
+------------
+
+*Release date: TBD*
+
+
 2.11.0 (Tonkinese)
 ------------------
 *Release date: 9 November 2025*
