@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import unicodedata
 from itertools import product
@@ -14,7 +15,7 @@ from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy, ngettext
+from django.utils.translation import gettext_lazy, ngettext, override
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
@@ -27,6 +28,7 @@ from draw.generator.powerpair import BasePowerPairedDrawGenerator
 from notifications.models import BulkNotification
 from notifications.views import RoundTemplateEmailCreateView
 from options.preferences import BPPositionCost
+from options.utils import use_team_code_names
 from participants.models import Adjudicator, Speaker, Team
 from participants.prefetch import populate_win_counts
 from participants.utils import get_side_history
@@ -789,6 +791,46 @@ class DrawReleaseView(DrawStatusEdit):
         self.round.draw_status = Round.Status.RELEASED
         self.round.save()
         self.log_action()
+
+        debates = self.round.debate_set.select_related('venue').prefetch_related(
+            'venue__venuecategory_set', 'debateadjudicator_set__adjudicator__participantwebpushdevice_set',
+            'debateteam_set__team__speaker_set__participantwebpushdevice_set',
+        ).all()
+        notification_title = _("%(tournament)s - %(round)s") % {'tournament': self.tournament.short_name, 'round': self.round.name}
+        use_code_names = use_team_code_names(self.tournament, admin=False)
+        for debate in debates:
+            matchup = debate.matchup_codes if use_code_names else debate.matchup
+            for d_adjudicator in debate.debateadjudicator_set.all():
+                for device in d_adjudicator.adjudicator.participantwebpushdevice_set.all():
+                    with override(device.language or 'en'):
+                        device.send_message(
+                            message=json.dumps({
+                                "title": notification_title,
+                                "message": ngettext(
+                                    "You are the %(type)s in %(venue)s, adjudicating %(matchup)s",
+                                    "You are a %(type)s in %(venue)s, adjudicating %(matchup)s",
+                                    1 if d_adjudicator.type == 'C' else 2,
+                                ) % {
+                                    'type': d_adjudicator.get_type_display(),
+                                    'venue': getattr(debate.venue, 'display_name', _('Room TBA')),
+                                    'matchup': matchup,
+                                },
+                            }),
+                        )
+            for d_team in debate.debateteam_set.all():
+                for speaker in d_team.team.speaker_set.all():
+                    for device in speaker.participantwebpushdevice_set.all():
+                        with override(device.language or 'en'):
+                            device.send_message(
+                                message=json.dumps({
+                                    "title": notification_title,
+                                    "message": _("You are the %(type)s in %(venue)s, with %(matchup)s") % {
+                                        'type': d_team.get_side_name(self.tournament),
+                                        'venue': getattr(debate.venue, 'display_name', _('Room TBA')),
+                                        'matchup': matchup,
+                                    },
+                                }),
+                            )
 
         messages.success(request, _("Released the draw."))
         return super().post(request, *args, **kwargs)

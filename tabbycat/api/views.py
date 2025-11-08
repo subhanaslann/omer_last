@@ -10,6 +10,7 @@ from django.db.models import Count, Prefetch, Q
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from dynamic_preferences.api.serializers import PreferenceSerializer
 from dynamic_preferences.api.viewsets import PerInstancePreferenceViewSet
+from push_notifications.api.rest_framework import WebPushDeviceViewSet as BaseWebPushDeviceViewSet
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.fields import DateTimeField
@@ -1522,3 +1523,8 @@ class ParticipantIdentificationView(TournamentAPIMixin, ModelViewSet):
 
     def get_object(self):
         return self.request.auth
+
+
+class ParticipantWebPushDeviceViewSet(TournamentAPIMixin, BaseWebPushDeviceViewSet):
+    serializer_class = serializers.ParticipantWebPushDeviceSerializer
+    authentication_classes = [URLKeyAuthentication]

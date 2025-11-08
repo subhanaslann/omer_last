@@ -17,11 +17,13 @@ class APILogActionMixin(LogActionMixin):
 
     def perform_create(self, serializer):
         self.obj = serializer.save(**self.lookup_kwargs())
-        self.log_action(type=self.action_log_type_created, agent=ActionLogEntry.Agent.API)
+        if hasattr(self, 'action_log_type_created'):
+            self.log_action(type=self.action_log_type_created, agent=ActionLogEntry.Agent.API)
 
     def perform_update(self, serializer):
         self.obj = serializer.save()
-        self.log_action(type=self.action_log_type_updated, agent=ActionLogEntry.Agent.API)
+        if hasattr(self, 'action_log_type_updated'):
+            self.log_action(type=self.action_log_type_updated, agent=ActionLogEntry.Agent.API)
 
     def lookup_kwargs(self):
         return {}

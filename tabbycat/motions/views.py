@@ -1,15 +1,17 @@
+import json
+
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import OuterRef, Prefetch, Q, Subquery
 from django.utils import timezone
 from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy, ngettext
+from django.utils.translation import gettext_lazy, ngettext, override
 from django.views.generic.base import TemplateView
 from django_summernote.widgets import SummernoteWidget
 
 from actionlog.mixins import LogActionMixin
 from actionlog.models import ActionLogEntry
-from notifications.models import BulkNotification
+from notifications.models import BulkNotification, ParticipantWebPushDevice
 from notifications.views import RoleColumnMixin, RoundTemplateEmailCreateView
 from participants.models import Speaker
 from results.models import BallotSubmission
@@ -168,6 +170,17 @@ class BaseReleaseMotionsView(AdministratorMixin, LogActionMixin, RoundMixin, Pos
         round.motions_status = self.motions_status
         round.save()
         self.log_action()
+
+        if self.motions_released:
+            notification_title = _("%(tournament)s - %(round)s") % {'tournament': self.tournament.short_name, 'round': self.round.name}
+            for device in ParticipantWebPushDevice.objects.filter(tournament=self.tournament):
+                with override(device.language or 'en'):
+                    device.send_message(
+                        message=json.dumps({
+                            "title": notification_title,
+                            "message": _("The motion has been released."),
+                        }),
+                    )
 
         messages.success(request, self.message_text)
         return super().post(request, *args, **kwargs)
