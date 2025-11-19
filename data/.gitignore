@@ -1,11 +1,8 @@
 # Ignore this entire directory
 /*
 
-# ...except for demonstration and test datasets
+# ...except for test datasets
 !.gitignore
-!bp88team/
-!australs24team/
-!minimal8team/
 !test/
 !presets/
 !fixtures/

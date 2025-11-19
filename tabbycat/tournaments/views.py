@@ -230,17 +230,6 @@ class CreateTournamentView(AdministratorMixin, WarnAboutDatabaseUseMixin, Create
     template_name = "create_tournament.html"
     db_warning_severity = messages.ERROR
 
-    def get_context_data(self, **kwargs):
-        demo_datasets = [
-            ('minimal8team', _("8-team generic dataset")),
-            ('australs24team', _("24-team Australs dataset")),
-            ('bp88team', _("88-team BP dataset")),
-        ]
-        kwargs['demo_datasets'] = demo_datasets
-        demo_slugs = [slug for slug, _ in demo_datasets]
-        kwargs['preexisting'] = Tournament.objects.filter(slug__in=demo_slugs).values_list('slug', flat=True)
-        return super().get_context_data(**kwargs)
-
     def get_success_url(self):
         t = Tournament.objects.order_by('id').last()
         return reverse_tournament('tournament-configure', tournament=t)
