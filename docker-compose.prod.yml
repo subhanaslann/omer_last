@@ -19,6 +19,7 @@ services:
       - DOCKER_REDIS=1
       - IN_DOCKER=1
       - USING_NGINX=1
+      - WEB_CONCURRENCY=8
 
   worker:
     environment:

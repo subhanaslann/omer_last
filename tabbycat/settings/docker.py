@@ -17,6 +17,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'http://0.0.0.0:8000',
+    'https://muhittab.com',
+    'http://muhittab.com',
 
     # Without port (default 80)
     'http://localhost',
@@ -47,18 +49,26 @@ if CUSTOM_PORT:
     CSRF_TRUSTED_ORIGINS.append(f'http://localhost:{CUSTOM_PORT}')
     CSRF_TRUSTED_ORIGINS.append(f'http://127.0.0.1:{CUSTOM_PORT}')
 
-# CSRF Cookie settings for Docker environment
-CSRF_COOKIE_SAMESITE = 'Lax'  # Allow cross-origin for Docker port mapping
-CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access for AJAX requests
-CSRF_USE_SESSIONS = False  # Store CSRF token in cookie, not session
-CSRF_COOKIE_DOMAIN = None  # Allow any domain (important for dynamic ports)
-CSRF_COOKIE_SECURE = False  # Allow HTTP in Docker development
 
 # Session Cookie settings
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True  # Keep sessions secure
-SESSION_COOKIE_SECURE = False  # Allow HTTP in Docker development
 SESSION_COOKIE_DOMAIN = None  # Allow any domain (important for dynamic ports)
+
+# Production SSL/HTTPS Settings
+# Trust the X-Forwarded-Proto header coming from the Nginx proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# If we are in production (DEBUG=0), enforce secure cookies
+if os.environ.get('DEBUG') == '0':
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'Lax'
+else:
+    # Development settings
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SAMESITE = 'Lax'
 
 DATABASES = {
     'default': {
