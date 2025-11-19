@@ -1570,12 +1570,12 @@
         },
         "redis": {
             "hashes": [
-                "sha256:1e66c8355b3443af78367c4937484cd875fdf9f5f14e1fed14aa95869e64f6d1",
-                "sha256:6546ada54354248a53a47342d36abe6172bb156f23d24f018fda2e3c06b9c97a"
+                "sha256:23c52b208f92b56103e17c5d06bdc1a6c2c0b3106583985a76a18f83b265de2b",
+                "sha256:b1cc3cfa5a2cb9c2ab3ba700864fb0ad75617b41f01352ce5779dabf6d5f9c3c"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.9'",
-            "version": "==7.0.0"
+            "markers": "python_version >= '3.10'",
+            "version": "==7.1.0"
         },
         "referencing": {
             "hashes": [
