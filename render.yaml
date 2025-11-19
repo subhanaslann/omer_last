@@ -34,9 +34,9 @@ services:
       - key: WEB_CONCURRENCY
         value: 4
       - key: TAB_DIRECTOR_EMAIL
-        sync: false
+        value: "admin@tabbycat.com"
       - key: TIME_ZONE
-        sync: false
+        value: "Europe/Istanbul"
       - key: ON_RENDER
         value: true
       - key: USING_NGINX
