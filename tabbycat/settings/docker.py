@@ -50,12 +50,15 @@ if CUSTOM_PORT:
 # CSRF Cookie settings for Docker environment
 CSRF_COOKIE_SAMESITE = 'Lax'  # Allow cross-origin for Docker port mapping
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access for AJAX requests
-CSRF_USE_SESSIONS = False  # Use cookies instead of sessions for better compatibility
+CSRF_USE_SESSIONS = False  # Store CSRF token in cookie, not session
+CSRF_COOKIE_DOMAIN = None  # Allow any domain (important for dynamic ports)
+CSRF_COOKIE_SECURE = False  # Allow HTTP in Docker development
 
 # Session Cookie settings
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True  # Keep sessions secure
 SESSION_COOKIE_SECURE = False  # Allow HTTP in Docker development
+SESSION_COOKIE_DOMAIN = None  # Allow any domain (important for dynamic ports)
 
 DATABASES = {
     'default': {

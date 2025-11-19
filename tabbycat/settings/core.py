@@ -96,9 +96,11 @@ FORMAT_MODULE_PATH = [
 MIDDLEWARE = [
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    # SessionMiddleware MUST come before CsrfViewMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # CsrfViewMiddleware MUST come after SessionMiddleware
+    'django.middleware.csrf.CsrfViewMiddleware',
     # User language preferences; must be after Session
     'django.middleware.locale.LocaleMiddleware',
     # Set Etags; i.e. cached requests not on network; must precede Common
