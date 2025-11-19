@@ -177,12 +177,27 @@
         },
         "autobahn": {
             "hashes": [
-                "sha256:a2d71ef1b0cf780b6d11f8b205fd2c7749765e65795f2ea7d823796642ee92c9",
-                "sha256:c56a2abe7ac78abbfb778c02892d673a4de58fd004d088cd7ab297db25918e81"
+                "sha256:055611e97deb463741f398f014fb902c8a7ccb6911550a671aab3ca329453d18",
+                "sha256:115101d665773da38cba23274d4b36ec10608aa1f84cede0011be0518dbd66e9",
+                "sha256:14f9b7bf938c491045ed39d76b6d300f6021f7db4189b3b5f36aeaea40ba7bca",
+                "sha256:173d5d836789dffc4292473ea359dcb7f708456a0ff82dcb8ca938d6ccadb12f",
+                "sha256:2d957e30bc83edd71844a1c97e675c3bf970fccb0814669f374913665758782b",
+                "sha256:4cd3965b58c557ee5f61949c2b660d70f4fda2dce05296c5fdf6a1516bc9b27d",
+                "sha256:59e2b0e03e9504fa352a1b305631c058e1297e7e4e5f49988270370567cee1c7",
+                "sha256:684fe4200ede3840b4973da8c04f0026459c8189d6bc10df31b1d933b5f01b7e",
+                "sha256:7113378b8f0a716c1814103b8d8e8c5d8722460527e54d8cd23dd330c65d5018",
+                "sha256:764f01bf3778a4e3fd1f6d3df9bfbf079772181c5e4915af5a588f7aa92d3d96",
+                "sha256:7b503e282082b823e85e963d00b49ed72aeae79d4d3b3929a997cad0780ffdb1",
+                "sha256:7ec979167e8b2c630fe4401e8d29a05e5caeb089aa4a7fda6384425084b339cc",
+                "sha256:9a11a59096e6cd8d8f458d2f8ec651b2d43923f537060d8d2087be1944120cd0",
+                "sha256:9ce998cc41645c388bb6842d75e87335ca8badaf29365c9d8f01467bd210f8c9",
+                "sha256:a66252583ee2b00e55d4f311618f87e7f0c0d1f837bbeb40b9277fc86ea027fd",
+                "sha256:aeeacb64ab633c627eb5e6a09d691e93ebb78c7d1f94791f9270cbbd104c8045",
+                "sha256:c92927ab2e90952edd7fe462aaf3b318d1531a34f516048a98270b9fb5237959"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.9'",
-            "version": "==24.4.2"
+            "markers": "python_version >= '3.11'",
+            "version": "==25.10.2"
         },
         "automat": {
             "hashes": [
