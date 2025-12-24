@@ -19,6 +19,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://0.0.0.0:8000',
     'https://muhittab.com',
     'http://muhittab.com',
+    'http://78.135.66.106',
+    'https://78.135.66.106',
 
     # Without port (default 80)
     'http://localhost',
