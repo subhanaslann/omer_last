@@ -8,6 +8,7 @@ __pycache__/
 # Compilation
 tabbycat/staticfiles/
 tabbycat/static/css/
+!tabbycat/static/css/style.css
 tabbycat/static/js/
 !tabbycat/static/js/theme-manager.js
 tabbycat/static/jsi18n/
