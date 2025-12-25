@@ -1,4 +1,113 @@
 //------------------------------------------------------------------------------
+// Dark Mode: Global Element Styles
+//------------------------------------------------------------------------------
+
+body {
+  background-color: var(--tc-body-bg);
+  color: var(--tc-body-color);
+  transition: var(--tc-theme-transition);
+}
+
+// Bootstrap component overrides for dark mode
+.card {
+  background-color: var(--tc-card-bg);
+  border-color: var(--tc-card-border);
+  transition: var(--tc-theme-transition);
+}
+
+.list-group-item {
+  background-color: var(--tc-list-group-bg);
+  border-color: var(--tc-list-group-border);
+  color: var(--tc-body-color);
+  transition: var(--tc-theme-transition);
+}
+
+.modal-content {
+  background-color: var(--tc-modal-bg);
+  border-color: var(--tc-border-color);
+}
+
+.modal-header {
+  background-color: var(--tc-modal-header-bg);
+  border-bottom-color: var(--tc-border-color);
+  color: var(--tc-body-color);
+}
+
+.modal-footer {
+  border-top-color: var(--tc-border-color);
+}
+
+.form-control {
+  background-color: var(--tc-input-bg);
+  border-color: var(--tc-input-border);
+  color: var(--tc-input-text);
+  transition: var(--tc-theme-transition);
+
+  &:focus {
+    background-color: var(--tc-input-bg);
+    color: var(--tc-input-text);
+    border-color: var(--tc-input-focus-border);
+  }
+
+  &:disabled,
+  &[readonly] {
+    background-color: var(--tc-input-disabled-bg);
+  }
+}
+
+.custom-select {
+  background-color: var(--tc-input-bg);
+  border-color: var(--tc-input-border);
+  color: var(--tc-input-text);
+}
+
+.input-group-text {
+  background-color: var(--tc-table-hover);
+  border-color: var(--tc-input-border);
+  color: var(--tc-body-color);
+}
+
+.text-muted {
+  color: var(--tc-text-muted) !important;
+}
+
+a {
+  color: var(--tc-link-color);
+
+  &:hover {
+    color: var(--tc-link-hover);
+  }
+}
+
+.breadcrumb {
+  background-color: var(--tc-breadcrumb-bg);
+}
+
+.progress {
+  background-color: var(--tc-progress-bg);
+}
+
+code {
+  background-color: var(--tc-code-bg);
+  color: var(--tc-code-color);
+}
+
+pre {
+  background-color: var(--tc-code-bg);
+  color: var(--tc-body-color);
+  border-color: var(--tc-border-color);
+}
+
+.badge-light {
+  background-color: var(--tc-badge-light-bg);
+  color: var(--tc-badge-light-color);
+}
+
+hr {
+  border-color: var(--tc-border-color);
+}
+
+//------------------------------------------------------------------------------
 // Full screen pages
 //------------------------------------------------------------------------------
 

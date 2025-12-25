@@ -4,18 +4,18 @@
 
 // For ModalForAllocating.vue
 .bg-bg {
-  background-color: $body-bg; // Need contrast with button sections, so can't use white
+  background-color: var(--tc-body-bg); // Need contrast with button sections
 }
 
 // For InlineAdjudicator.vue
 .inline-adjudicator {
   height: 100%;
   position: relative;
-  border: 5px solid $white;
+  border: 5px solid var(--tc-card-bg);
 
   &:hover { // Need to override conflict hovers
     background: $purple !important;
-    color: $white;
+    color: #fff;
     border-color: darken($purple, 7.5%) !important;
   }
 
@@ -41,11 +41,11 @@
 .inline-team {
   height: 100%; // Need to fill space
   position: relative; // Need to allow for the seen marker
-  border: 5px solid $white; // Placeholder; so doesn't resize with highlights
+  border: 5px solid var(--tc-card-bg); // Placeholder; so doesn't resize with highlights
 
   &:hover { // Need to override conflict hovers
     background: $purple !important;
-    color: $white;
+    color: #fff;
     border-color: darken($purple, 7.5%) !important;
   }
 
@@ -144,7 +144,7 @@
 .draw-header {
   @extend .draw-row;
 
-  border-top: 1px solid $input-border-color;
+  border-top: 1px solid var(--tc-input-border);
   border-radius: 4px 4px 0 0;
   padding-top: 8px;
 }
@@ -152,24 +152,25 @@
 .draw-row {
   @extend .flex-horizontal;
 
-  background: #fff; // Need to compensate for lack of table background
-  border-left: 1px solid $input-border-color;
-  border-right: 1px solid $input-border-color;
+  background: var(--tc-card-bg); // Need to compensate for lack of table background
+  border-left: 1px solid var(--tc-input-border);
+  border-right: 1px solid var(--tc-input-border);
+  transition: var(--tc-theme-transition);
 }
 
 .draw-cell {
   @extend .flex-cell;
   @extend .flex-vertical-center;
 
-  border-bottom: 2px solid $table-border-color;
+  border-bottom: 2px solid var(--tc-table-border);
 
   &.droppable-cell {
-    border-bottom-color: #fff; // Have more contrast in drag/drop UIs
+    border-bottom-color: var(--tc-card-bg); // Have more contrast in drag/drop UIs
   }
 }
 
 .thead {
-  border-bottom: 2px solid $table-border-color;
+  border-bottom: 2px solid var(--tc-table-border);
   padding-bottom: $table-cell-padding;
 }
 
@@ -255,7 +256,7 @@
 
   > .conflictable {
     // Team cells need some border state for in panel conflicts
-    border-color: #fff;
+    border-color: var(--tc-card-bg);
     border-width: 4px;
     border-style: solid;
 
@@ -272,7 +273,7 @@
 }
 
 .positions-parent > div {
-  border-left: 2px solid $table-border-color;
+  border-left: 2px solid var(--tc-table-border);
   min-height: 50px; // Dont let it collapse when no adjs are present
   &:first-child {
     border-left: 0;

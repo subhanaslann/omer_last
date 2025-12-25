@@ -7,6 +7,18 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+  <!-- Dark Mode: Prevent flash of wrong theme -->
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('tabbycat-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch(e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
   <title>{% if tournament %}{{ tournament.short_name }}{% else %}{% trans "Tabbycat" %}{% endif %} | {% if page_title %}{{ page_title }}{% else %}{% block page-title %}{% endblock %}{% endif %}</title>
 
   {% if tournament %}
@@ -35,6 +47,7 @@
   <link rel="icon" type="image/png" href="{% static 'logo-32x32.png' %}" sizes="32x32" />
   <link rel="icon" type="image/png" href="{% static 'logo-16x16.png' %}" sizes="16x16" />
   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+  <script src="{% static 'js/theme-manager.js' %}"></script>
   {% block extra-css %}{% endblock %}
   {% block extra-head %}{% endblock %}
 

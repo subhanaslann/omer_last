@@ -1,5 +1,23 @@
 @media print {
 
+  // Force light mode for printing - override dark mode variables
+  :root {
+    --tc-body-bg: #fff !important;
+    --tc-body-color: #000 !important;
+    --tc-alt-bg: #fff !important;
+    --tc-table-bg: #fff !important;
+    --tc-table-header-bg: #fff !important;
+    --tc-card-bg: #fff !important;
+    --tc-input-bg: #fff !important;
+    --tc-border-color: #dee2e6 !important;
+    --tc-table-border: #dee2e6 !important;
+  }
+
+  // Hide theme toggle button when printing
+  .theme-toggle-btn {
+    display: none !important;
+  }
+
   // Used by private URL pages
   .printable-page-break {
     page-break-after: always;

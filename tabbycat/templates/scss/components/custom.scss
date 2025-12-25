@@ -71,3 +71,12 @@ $input-btn-padding-y:       0.625rem;
 $input-btn-padding-y-sm:    0.3125rem;
 
 $navbar-light-hover-color:  $purple;
+
+//------------------------------------------------------------------------------
+// Dark Mode: Bootstrap Override Mixins
+// These are applied after theme-variables.scss loads the CSS custom properties
+//------------------------------------------------------------------------------
+
+// Note: Actual dark mode styles are applied via CSS custom properties
+// defined in _theme-variables.scss. The following SCSS variables are used
+// as fallbacks and for initial load before theme-variables is processed.

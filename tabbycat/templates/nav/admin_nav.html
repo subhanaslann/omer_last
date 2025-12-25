@@ -300,6 +300,14 @@
   {% endfor %}
 
   <div class="list-group-item d-inline-block">
+    <button type="button" class="btn btn-link theme-toggle-btn" data-theme-toggle title="{% trans 'Toggle dark mode' %}">
+      <i data-feather="moon" class="theme-icon-light"></i>
+      <i data-feather="sun" class="theme-icon-dark"></i>
+      <span class="d-none d-md-inline ml-1">{% trans "Dark Mode" %}</span>
+    </button>
+  </div>
+
+  <div class="list-group-item d-inline-block">
     <form id="logout-form" action="{% url 'logout' %}" data-parent="#sidebar" method="post" class="collapsed">
       {% csrf_token %}
       <button type="submit" class="btn btn-link">

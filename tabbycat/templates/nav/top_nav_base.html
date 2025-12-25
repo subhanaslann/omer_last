@@ -103,6 +103,13 @@
 
     <ul class="navbar-nav navbar-my-lg-0">
       <li class="nav-item">
+        <button type="button" class="btn btn-link nav-link theme-toggle-btn" data-theme-toggle title="{% trans 'Toggle dark mode' %}">
+          <i data-feather="moon" class="theme-icon-light"></i>
+          <i data-feather="sun" class="theme-icon-dark"></i>
+          <span class="d-lg-none ml-2">{% trans "Dark Mode" %}</span>
+        </button>
+      </li>
+      <li class="nav-item">
         {% if user.is_authenticated %}
           <form id="logout-form" action="{% url 'logout' %}" method="post">
             {% csrf_token %}

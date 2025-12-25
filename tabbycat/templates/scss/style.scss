@@ -8,6 +8,9 @@
 // Tabbycat key variables/mixins (load after bootstrap)
 @import 'components/variables';
 
+// Theme CSS Custom Properties (Dark Mode Support)
+@import 'components/theme-variables';
+
 // General styles
 @import 'modules/flexbox';
 @import 'modules/footer';

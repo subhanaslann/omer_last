@@ -18,8 +18,20 @@
 }
 
 // Same as .btn; but .btn-link removes this radius for some reason
+// Dark mode support for btn-link text color
 .btn-link {
   border-radius: $border-radius;
+  color: var(--tc-link-color);
+  transition: var(--tc-theme-transition);
+
+  &:hover,
+  &:focus {
+    color: var(--tc-link-hover);
+  }
+
+  &:disabled {
+    color: var(--tc-text-muted);
+  }
 }
 
 // Disable hovers without using disable class (it dulls)
@@ -31,7 +43,7 @@
 @each $color, $value in $theme-colors {
 
   .btn-outline-#{$color} {
-    background-color: rgba(255, 255, 255, 0.75);
+    background-color: var(--tc-card-bg);
   }
 }
 

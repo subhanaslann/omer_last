@@ -8,18 +8,25 @@
 
 .table {
   font-size: $font-size-sm;
-  background: $alt-bg; // For when tables blow out on mobile
+  background: var(--tc-table-bg);
+  color: var(--tc-body-color);
   margin-bottom: 0; // Handled by the container elements
+  transition: var(--tc-theme-transition);
 
   th {
     border-top: 0;
+    border-color: var(--tc-table-border);
+  }
+
+  td {
+    border-color: var(--tc-table-border);
   }
 
   > tbody > tr:hover td {
-    background-color: $table-bg-hover;
+    background-color: var(--tc-table-hover);
 
     .hide-underline {
-      border-bottom-color: $table-bg-hover;
+      border-bottom-color: var(--tc-table-hover);
     }
   }
 
@@ -27,7 +34,7 @@
     background-color: transparent;
 
     .hide-underline {
-      border-bottom-color: #ccc;
+      border-bottom-color: var(--tc-border-color);
     }
   }
 
@@ -46,7 +53,8 @@ thead,
 
   font-size: $font-size-base;
   line-height: $font-size-base;
-  background: $alt-bg; // Fixed header needs a background while scrolling
+  background: var(--tc-table-header-bg);
+  color: var(--tc-body-color);
   min-height: 40px; // Must accomodate vue-sort key without resizing
   position: sticky;
   inset-block-start: 0;
@@ -203,7 +211,7 @@ thead,
 
   // For highlighting boundaries between metrics in "draw with details"
   &.highlight-col {
-    border-left: 2px dotted $droppable-bg;
+    border-left: 2px dotted var(--tc-droppable-bg);
   }
 
   .result-icon {

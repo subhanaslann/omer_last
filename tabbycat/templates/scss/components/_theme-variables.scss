@@ -1,0 +1,257 @@
+//------------------------------------------------------------------------------
+// Tabbycat Theme CSS Custom Properties
+// Dark Mode Support - Light theme (default) and Dark theme
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Light Theme (Default)
+//------------------------------------------------------------------------------
+
+:root {
+  // Core Colors
+  --tc-body-bg: #f8fafc;
+  --tc-body-color: #{$gray-900};
+  --tc-alt-bg: #fff;
+  --tc-text-muted: #{$gray-600};
+
+  // Layout Colors
+  --tc-sidebar-bg: #333c47;
+  --tc-sidebar-text: #{$gray-400};
+  --tc-sidebar-hover: #{$gray-300};
+  --tc-sidebar-active-bg: #2a323b;
+  --tc-navbar-bg: #fff;
+  --tc-navbar-border: #{$gray-200};
+  --tc-footer-bg: #fff;
+
+  // Table Colors
+  --tc-table-bg: #fff;
+  --tc-table-hover: #e3e3e3;
+  --tc-table-border: #{$gray-300};
+  --tc-table-header-bg: #fff;
+  --tc-table-stripe: rgba(0, 0, 0, 0.03);
+
+  // Card/Container Colors
+  --tc-card-bg: #fff;
+  --tc-card-border: #{$gray-200};
+  --tc-droppable-bg: #{$gray-200};
+
+  // Input/Form Colors
+  --tc-input-bg: #fff;
+  --tc-input-border: #{$gray-400};
+  --tc-input-text: #{$gray-900};
+  --tc-input-placeholder: #{$gray-500};
+  --tc-input-focus-border: #{$purple};
+  --tc-input-disabled-bg: #{$gray-100};
+
+  // Modal Colors
+  --tc-modal-bg: #fff;
+  --tc-modal-header-bg: #{$gray-100};
+  --tc-modal-backdrop: rgba(0, 0, 0, 0.5);
+
+  // Dropdown Colors
+  --tc-dropdown-bg: #fff;
+  --tc-dropdown-border: #{$gray-200};
+  --tc-dropdown-hover: #{$gray-100};
+  --tc-dropdown-divider: #{$gray-200};
+
+  // Alert/Message backgrounds (keep semantic but add contrast)
+  --tc-alert-bg-opacity: 0.15;
+
+  // Shadows
+  --tc-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --tc-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  --tc-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.15);
+
+  // Borders
+  --tc-border-color: #{$gray-200};
+  --tc-border-color-strong: #{$gray-300};
+
+  // Links
+  --tc-link-color: #{$purple};
+  --tc-link-hover: #{darken($purple, 10%)};
+
+  // List Group
+  --tc-list-group-bg: #fff;
+  --tc-list-group-border: #{$gray-200};
+  --tc-list-group-hover: #{$gray-100};
+  --tc-list-group-active-bg: #{$purple};
+
+  // Tooltip/Popover
+  --tc-tooltip-bg: #{$gray-900};
+  --tc-tooltip-color: #fff;
+
+  // Progress
+  --tc-progress-bg: #{$gray-200};
+
+  // Code
+  --tc-code-bg: #{$gray-100};
+  --tc-code-color: #{$pink};
+
+  // Badge
+  --tc-badge-light-bg: #{$gray-100};
+  --tc-badge-light-color: #{$gray-800};
+
+  // Breadcrumb
+  --tc-breadcrumb-bg: #{$gray-200};
+  --tc-breadcrumb-divider: #{$gray-500};
+
+  // Theme transition
+  --tc-theme-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+//------------------------------------------------------------------------------
+// Dark Theme
+//------------------------------------------------------------------------------
+
+[data-theme="dark"] {
+  // Core Colors
+  --tc-body-bg: #1a1d21;
+  --tc-body-color: #e4e6eb;
+  --tc-alt-bg: #242830;
+  --tc-text-muted: #a8adb5;
+
+  // Layout Colors
+  --tc-sidebar-bg: #15171a;
+  --tc-sidebar-text: #a8adb5;
+  --tc-sidebar-hover: #e4e6eb;
+  --tc-sidebar-active-bg: #242830;
+  --tc-navbar-bg: #1a1d21;
+  --tc-navbar-border: #2d3139;
+  --tc-footer-bg: #1a1d21;
+
+  // Table Colors
+  --tc-table-bg: #242830;
+  --tc-table-hover: #2d3139;
+  --tc-table-border: #3d4250;
+  --tc-table-header-bg: #1f232a;
+  --tc-table-stripe: rgba(255, 255, 255, 0.03);
+
+  // Card/Container Colors
+  --tc-card-bg: #242830;
+  --tc-card-border: #3d4250;
+  --tc-droppable-bg: #2d3139;
+
+  // Input/Form Colors
+  --tc-input-bg: #2d3139;
+  --tc-input-border: #3d4250;
+  --tc-input-text: #e4e6eb;
+  --tc-input-placeholder: #6c757d;
+  --tc-input-focus-border: #{lighten($purple, 10%)};
+  --tc-input-disabled-bg: #1f232a;
+
+  // Modal Colors
+  --tc-modal-bg: #242830;
+  --tc-modal-header-bg: #1a1d21;
+  --tc-modal-backdrop: rgba(0, 0, 0, 0.7);
+
+  // Dropdown Colors
+  --tc-dropdown-bg: #242830;
+  --tc-dropdown-border: #3d4250;
+  --tc-dropdown-hover: #2d3139;
+  --tc-dropdown-divider: #3d4250;
+
+  // Alert/Message backgrounds
+  --tc-alert-bg-opacity: 0.25;
+
+  // Shadows (stronger for dark mode)
+  --tc-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
+  --tc-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+  --tc-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.4);
+
+  // Borders
+  --tc-border-color: #3d4250;
+  --tc-border-color-strong: #4d5260;
+
+  // Links (slightly lighter for dark mode)
+  --tc-link-color: #{lighten($purple, 15%)};
+  --tc-link-hover: #{lighten($purple, 25%)};
+
+  // List Group
+  --tc-list-group-bg: #242830;
+  --tc-list-group-border: #3d4250;
+  --tc-list-group-hover: #2d3139;
+  --tc-list-group-active-bg: #{$purple};
+
+  // Tooltip/Popover (inverted for dark mode)
+  --tc-tooltip-bg: #e4e6eb;
+  --tc-tooltip-color: #1a1d21;
+
+  // Progress
+  --tc-progress-bg: #2d3139;
+
+  // Code
+  --tc-code-bg: #2d3139;
+  --tc-code-color: #{lighten($pink, 10%)};
+
+  // Badge
+  --tc-badge-light-bg: #2d3139;
+  --tc-badge-light-color: #e4e6eb;
+
+  // Breadcrumb
+  --tc-breadcrumb-bg: #2d3139;
+  --tc-breadcrumb-divider: #6c757d;
+}
+
+//------------------------------------------------------------------------------
+// Theme Toggle Button Styles
+//------------------------------------------------------------------------------
+
+.theme-toggle-btn {
+  // Touch-friendly minimum size (44x44px recommended)
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: $border-radius;
+  transition: var(--tc-theme-transition);
+  color: var(--tc-body-color);
+  padding: 0.5rem;
+
+  &:hover,
+  &:focus {
+    background-color: var(--tc-table-hover);
+    outline: none;
+    color: var(--tc-link-color);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  .feather {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Show correct icon based on theme
+.theme-icon-light {
+  display: inline-block;
+}
+
+.theme-icon-dark {
+  display: none;
+}
+
+[data-theme="dark"] {
+  .theme-icon-light {
+    display: none;
+  }
+
+  .theme-icon-dark {
+    display: inline-block;
+  }
+}
+
+// Mobile responsive
+@include media-breakpoint-down(sm) {
+  .theme-toggle-btn {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.75rem 1rem;
+  }
+}

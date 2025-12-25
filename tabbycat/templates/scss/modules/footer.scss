@@ -18,10 +18,25 @@ body {
   bottom: 0;
   width: 100%;
   height: $footer-height;
+  background-color: var(--tc-footer-bg);
+  border-top: 1px solid var(--tc-border-color);
+  transition: var(--tc-theme-transition);
 
   a {
-    border-bottom: 1px solid theme-color("secondary");
-    color: theme-color("dark");
+    border-bottom: 1px solid var(--tc-border-color);
+    color: var(--tc-body-color);
+  }
+
+  .navbar-light {
+    background: var(--tc-footer-bg);
+  }
+
+  h6, p {
+    color: var(--tc-body-color);
+  }
+
+  .text-muted {
+    color: var(--tc-text-muted) !important;
   }
 }
 
